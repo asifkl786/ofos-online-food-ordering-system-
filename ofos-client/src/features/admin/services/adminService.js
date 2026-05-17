@@ -1,0 +1,51 @@
+import api from '../../../api/axiosConfig';
+
+export const adminService = {
+  getSummary: () => api.get('/admin/summary'),
+  getUsers: (page = 0, size = 8) => api.get('/users', { params: { page, size } }),
+  getRestaurants: (page = 0, size = 8) => api.get('/restaurants', { params: { page, size, sortBy: 'createdAt', sortDirection: 'DESC' } }),
+  getOrders: (page = 0, size = 8) => api.get('/orders', { params: { page, size } }),
+  getMenuItems: (page = 0, size = 8) => api.get('/menu', { params: { page, size } }),
+  getCategories: () => api.get('/categories'),
+  getDeliveryPartners: (page = 0, size = 8) => api.get('/delivery/partners', { params: { page, size } }),
+  getPayments: (page = 0, size = 8) => api.get('/payments', { params: { page, size } }),
+  getWalletTransactions: (page = 0, size = 8) => api.get('/wallet/admin/transactions', { params: { page, size } }),
+  getReviews: (page = 0, size = 8) => api.get('/reviews', { params: { page, size } }),
+  getAuditLogs: (page = 0, size = 8, filters = {}) => api.get('/admin/audit-logs', {
+    params: { page, size, search: filters.search, status: filters.status || 'ALL', method: filters.method || 'ALL' },
+  }),
+  downloadRevenueInvoice: ({ startDate, endDate }) => api.get('/admin/revenue-invoice', {
+    params: { startDate, endDate },
+    responseType: 'blob',
+  }),
+  activateUser: (id) => api.post(`/users/${id}/activate`),
+  deactivateUser: (id) => api.post(`/users/${id}/deactivate`),
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  verifyRestaurant: (id, isVerified) => api.patch(`/restaurants/${id}/verify`, null, { params: { isVerified } }),
+  updateRestaurantStatus: (id, isOpen) => api.patch(`/restaurants/${id}/status`, { isOpen }, { params: { isOpen } }),
+  deleteRestaurant: (id) => api.delete(`/restaurants/${id}`),
+  updateOrderStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }, { params: { status } }),
+  createMenuItem: (restaurantId, menuItem) => api.post(`/menu/restaurant/${restaurantId}`, menuItem),
+  updateMenuItemAvailability: (id, isAvailable) => api.patch(`/menu/${id}/availability`, null, { params: { isAvailable } }),
+  updateMenuItemPrice: (id, price) => api.patch(`/menu/${id}/price`, { price }, { params: { price } }),
+  updateMenuItemDiscount: (id, discountPercentage) => api.patch(`/menu/${id}/discount`, { discountPercentage }, { params: { discountPercentage } }),
+  deleteMenuItem: (id) => api.delete(`/menu/${id}`),
+  createCategory: (category) => api.post('/categories', category),
+  updateCategory: (id, category) => api.put(`/categories/${id}`, category),
+  activateCategory: (id) => api.patch(`/categories/${id}/activate`, {}),
+  deactivateCategory: (id) => api.patch(`/categories/${id}/deactivate`, {}),
+  deleteCategory: (id) => api.delete(`/categories/${id}`),
+  verifyDeliveryPartner: (id, isVerified) => api.patch(`/delivery/partners/${id}/verify`, null, { params: { isVerified } }),
+  updateDeliveryPartnerAvailability: (id, isAvailable) => api.patch(`/delivery/partners/${id}/availability`, null, { params: { isAvailable } }),
+  refundPayment: (paymentId, refundAmount, refundReason) => api.post('/payments/refund', { paymentId, refundAmount, refundReason }),
+  addCashback: (userId, amount, reason) => api.post('/wallet/admin/cashback', null, { params: { userId, amount, reason } }),
+  approveReview: (id) => api.patch(`/reviews/${id}/approve`),
+  deleteReview: (id) => api.delete(`/reviews/${id}`),
+  createAdmin: (adminData) => api.post('/auth/admin/register', {
+    ...adminData,
+    phoneNumber: adminData.phoneNumber?.trim() || null,
+    role: 'ADMIN',
+  }),
+};
+
+

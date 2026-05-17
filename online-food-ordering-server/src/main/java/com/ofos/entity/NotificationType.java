@@ -1,0 +1,18 @@
+package com.ofos.entity;
+
+public enum NotificationType {
+    ORDER_CONFIRMATION,
+    ORDER_STATUS_UPDATE,
+    ORDER_DELIVERED,
+    ORDER_CANCELLED,
+    PAYMENT_SUCCESS,
+    PAYMENT_FAILED,
+    REFUND_PROCESSED,
+    WELCOME,
+    PROMOTION,
+    OFFER,
+    REMINDER,
+    SYSTEM_ALERT,
+    DELIVERY_UPDATE,
+    REVIEW_REQUEST
+}
