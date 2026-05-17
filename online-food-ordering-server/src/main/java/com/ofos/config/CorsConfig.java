@@ -20,7 +20,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(parseAllowedOrigins());
+        config.setAllowedOriginPatterns(parseAllowedOrigins());
         // PATCH is required for order status, menu availability, restaurant status, and other partial updates from the SPA.
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
