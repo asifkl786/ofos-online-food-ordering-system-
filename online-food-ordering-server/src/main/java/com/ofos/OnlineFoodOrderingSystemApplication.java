@@ -27,7 +27,8 @@ public class OnlineFoodOrderingSystemApplication {
 
      URI uri = URI.create(databaseUrl);
      String[] userInfo = uri.getUserInfo() != null ? uri.getUserInfo().split(":", 2) : new String[] {"", ""};
-     String jdbcUrl = "jdbc:postgresql://" + uri.getHost() + ":" + uri.getPort() + uri.getPath();
+     String port = uri.getPort() > 0 ? ":" + uri.getPort() : "";
+     String jdbcUrl = "jdbc:postgresql://" + uri.getHost() + port + uri.getPath();
 
      System.setProperty("DB_URL", jdbcUrl);
      if (System.getenv("DB_USERNAME") == null && userInfo.length > 0) {
