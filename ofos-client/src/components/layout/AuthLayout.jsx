@@ -108,15 +108,15 @@ export default function AuthLayout() {
 
   return (
     <div
-      className="min-h-screen overflow-y-auto bg-cover bg-center"
+      className="h-screen overflow-hidden bg-cover bg-center"
       style={{
         backgroundImage: 'linear-gradient(115deg, rgba(15, 23, 42, 0.90), rgba(31, 41, 55, 0.76)), url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=85)',
       }}
     >
-      <div className="container mx-auto min-h-screen px-4 py-6 lg:py-8">
-        <div className="flex min-h-[calc(100vh-3rem)] flex-col lg:min-h-[calc(100vh-4rem)] lg:flex-row">
+      <div className="container mx-auto h-full px-4 py-4">
+        <div className="flex h-full flex-col lg:flex-row">
           {/* Left Side - Brand Section */}
-          <div className="hidden lg:flex lg:w-1/2 flex-col justify-center p-8 lg:p-10">
+          <div className="hidden lg:flex lg:w-1/2 flex-col justify-center p-5 lg:p-8">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
