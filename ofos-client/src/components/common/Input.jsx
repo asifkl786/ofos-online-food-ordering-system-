@@ -117,7 +117,7 @@ const Input = forwardRef(({
       )}
       
       {/* Success Message */}
-      {isValid && !showError && (
+      {showSuccess && isValid && !showError && (
         <div className="mt-1.5 flex items-start gap-1.5">
           <FiCheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
           <p className="text-xs text-green-600">

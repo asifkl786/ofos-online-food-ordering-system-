@@ -79,13 +79,13 @@ export default function RegisterEnhance() {
   };
 
   return (
-    <section className="grid h-full max-h-[calc(100vh-32px)] w-full overflow-hidden rounded-2xl border border-white/25 bg-white/15 shadow-2xl backdrop-blur-xl lg:grid-cols-[260px_1fr]">
-          <aside className="hidden border-r border-white/15 bg-orange-500/80 p-6 text-white backdrop-blur-md lg:flex lg:flex-col lg:justify-between">
+    <section className="grid h-full max-h-[calc(100vh-32px)] w-full overflow-hidden rounded-2xl border border-white/25 bg-white/15 shadow-2xl backdrop-blur-xl lg:grid-cols-[240px_1fr]">
+          <aside className="hidden border-r border-white/15 bg-orange-500/80 p-5 text-white backdrop-blur-md lg:flex lg:flex-col lg:justify-between">
             <div>
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white text-lg font-bold text-orange-600 shadow-lg">
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white text-base font-bold text-orange-600 shadow-lg">
                 OF
               </div>
-              <h1 className="text-2xl font-bold leading-tight">Create your Online Food account</h1>
+              <h1 className="text-xl font-bold leading-tight">Create your Online Food account</h1>
               <p className="mt-3 text-sm leading-5 text-orange-50">
                 Register once and continue as a customer, restaurant owner, or delivery partner from one simple account.
               </p>
@@ -97,11 +97,11 @@ export default function RegisterEnhance() {
             </div>
           </aside>
 
-          <div className="min-w-0 p-4 sm:p-5 lg:p-6">
-            <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="min-w-0 p-3 sm:p-4 lg:p-5">
+            <div className="mb-2 flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-orange-600">Online Food</p>
-                <h2 className="text-xl font-bold text-white">Create Account</h2>
+                <h2 className="text-lg font-bold text-white">Create Account</h2>
               </div>
               <p className="text-right text-sm text-white/70">
                 Have account? <Link to="/login" className="font-semibold text-orange-600 hover:text-orange-700">Sign in</Link>
@@ -125,8 +125,8 @@ export default function RegisterEnhance() {
               validateOnBlur
             >
               {({ isSubmitting, values, handleChange, handleBlur, touched, errors, setFieldValue, isValid }) => (
-                <Form className="space-y-2.5">
-                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <Form className="space-y-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <Input
                       label="First Name"
                       name="firstName"
@@ -157,7 +157,7 @@ export default function RegisterEnhance() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <Input
                       label="Email Address"
                       name="email"
@@ -191,7 +191,7 @@ export default function RegisterEnhance() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div>
                       <Input
                         label="Password"
@@ -238,7 +238,7 @@ export default function RegisterEnhance() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-white/90">
+                    <label className="mb-1.5 block text-sm font-medium text-white/90">
                       I want to join as <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -250,7 +250,7 @@ export default function RegisterEnhance() {
                             key={role.value}
                             type="button"
                             onClick={() => setFieldValue('role', role.value)}
-                            className={`flex min-h-16 items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-all ${
+                            className={`flex min-h-14 items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left transition-all ${
                               isSelected
                                 ? 'border-orange-300 bg-orange-500/25 text-white shadow-sm'
                                 : 'border-white/20 text-white/80 hover:border-orange-200/70 hover:bg-white/15'
@@ -282,7 +282,7 @@ export default function RegisterEnhance() {
                     type="submit"
                     isLoading={isSubmitting || isLoading}
                     disabled={isSubmitting || isLoading || !isValid}
-                    className="w-full rounded-xl py-2 text-sm font-semibold shadow-md disabled:transform-none"
+                    className="w-full rounded-xl py-1.5 text-sm font-semibold shadow-md disabled:transform-none"
                   >
                     {isSubmitting || isLoading ? 'Creating Account...' : 'Create Account'}
                   </Button>
@@ -297,6 +297,5 @@ export default function RegisterEnhance() {
     </section>
   );
 }
-
 
 
