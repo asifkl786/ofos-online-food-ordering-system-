@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { FiUser, FiMail, FiPhone, FiCalendar, FiEdit2, FiShield, FiCreditCard } from 'react-icons/fi';
+import { FiBell, FiBriefcase, FiCalendar, FiChevronRight, FiCreditCard, FiEdit2, FiMail, FiMapPin, FiPhone, FiShield, FiShoppingBag, FiTruck, FiUser } from 'react-icons/fi';
 import UpdateProfile from './UpdateProfile';
 import ChangePassword from './ChangePassword';
 import Button from '../../../components/common/Button';
@@ -34,6 +35,34 @@ export default function Profile() {
     return badges[role] || 'bg-gray-100 text-gray-800';
   };
 
+  const accountLinksByRole = {
+    CUSTOMER: [
+      { label: 'My Orders', description: 'View order history and track active orders.', path: '/orders', icon: FiShoppingBag },
+      { label: 'Addresses', description: 'Manage delivery addresses and defaults.', path: '/addresses', icon: FiMapPin },
+      { label: 'Wallet', description: 'Check balance and wallet transactions.', path: '/wallet', icon: FiBriefcase },
+      { label: 'Notifications', description: 'Read updates, order alerts, and messages.', path: '/notifications', icon: FiBell },
+      { label: 'Become a Delivery Partner', description: 'Register to start accepting deliveries.', path: '/delivery/register', icon: FiTruck },
+    ],
+    RESTAURANT_OWNER: [
+      { label: 'My Restaurants', description: 'Manage restaurant details and menus.', path: '/owner/restaurants', icon: FiUser },
+      { label: 'Restaurant Orders', description: 'Review and update incoming orders.', path: '/owner/orders', icon: FiShoppingBag },
+      { label: 'Wallet', description: 'Check payouts and wallet transactions.', path: '/wallet', icon: FiBriefcase },
+      { label: 'Notifications', description: 'Read important restaurant updates.', path: '/notifications', icon: FiBell },
+    ],
+    DELIVERY_PARTNER: [
+      { label: 'Delivery Dashboard', description: 'Manage active deliveries and earnings.', path: '/delivery/dashboard', icon: FiTruck },
+      { label: 'My Orders', description: 'Review completed delivery orders.', path: '/orders', icon: FiShoppingBag },
+      { label: 'Wallet', description: 'Check earnings and wallet transactions.', path: '/wallet', icon: FiBriefcase },
+      { label: 'Notifications', description: 'Read delivery alerts and account updates.', path: '/notifications', icon: FiBell },
+    ],
+    ADMIN: [
+      { label: 'Admin Dashboard', description: 'Open admin controls and reporting.', path: '/admin/dashboard', icon: FiShield },
+      { label: 'Notifications', description: 'Read system and account notifications.', path: '/notifications', icon: FiBell },
+    ],
+  };
+
+  const accountLinks = accountLinksByRole[user?.role] || accountLinksByRole.CUSTOMER;
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -64,10 +93,10 @@ export default function Profile() {
 
       {/* Tabs */}
       <div className="border-b border-gray-200 mb-6">
-        <nav className="flex space-x-8">
+        <nav className="flex gap-6 overflow-x-auto">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+            className={`pb-4 px-1 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
               activeTab === 'profile'
                 ? 'border-orange-500 text-orange-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -77,7 +106,7 @@ export default function Profile() {
           </button>
           <button
             onClick={() => setActiveTab('security')}
-            className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+            className={`pb-4 px-1 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
               activeTab === 'security'
                 ? 'border-orange-500 text-orange-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -86,8 +115,18 @@ export default function Profile() {
             Security
           </button>
           <button
+            onClick={() => setActiveTab('account')}
+            className={`pb-4 px-1 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              activeTab === 'account'
+                ? 'border-orange-500 text-orange-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Account Links
+          </button>
+          <button
             onClick={() => setActiveTab('payment')}
-            className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+            className={`pb-4 px-1 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
               activeTab === 'payment'
                 ? 'border-orange-500 text-orange-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -143,6 +182,36 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Account Links Tab */}
+      {activeTab === 'account' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Account Links</h2>
+            <p className="text-sm text-gray-500 mt-1">Your common account pages are grouped here so the header menu stays simple.</p>
+          </div>
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {accountLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className="group flex items-center justify-between rounded-xl border border-gray-200 p-4 hover:border-orange-200 hover:bg-orange-50/60 transition-colors"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="mt-1 rounded-lg bg-orange-100 p-2 text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                    <link.icon className="w-5 h-5" />
+                  </span>
+                  <span>
+                    <span className="block font-semibold text-gray-900">{link.label}</span>
+                    <span className="block text-sm text-gray-500 mt-1">{link.description}</span>
+                  </span>
+                </div>
+                <FiChevronRight className="w-5 h-5 text-gray-300 group-hover:text-orange-500" />
+              </Link>
+            ))}
           </div>
         </div>
       )}

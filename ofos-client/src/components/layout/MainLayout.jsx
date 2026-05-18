@@ -14,9 +14,6 @@ import {
   FiHeart,
   FiStar,
   FiTruck,
-  FiCreditCard,
-  FiSettings,
-  FiHelpCircle,
   FiShield,
   FiLogIn,
   FiMapPin,
@@ -143,8 +140,6 @@ export default function MainLayout() {
       { name: 'Admin Dashboard', icon: FiShield, path: '/admin/dashboard' },
       { name: 'My Profile', icon: FiUser, path: '/profile' },
       { name: 'Notifications', icon: FiBell, path: '/notifications' },
-      { name: 'Settings', icon: FiSettings, path: '/settings' },
-      { name: 'Help Center', icon: FiHelpCircle, path: '/help' },
     ],
     RESTAURANT_OWNER: [
       { name: 'My Profile', icon: FiUser, path: '/profile' },
@@ -152,8 +147,6 @@ export default function MainLayout() {
       { name: 'Restaurant Orders', icon: FiShoppingBag, path: '/owner/orders' },
       { name: 'My Wallet', icon: FiBriefcase, path: '/wallet' },
       { name: 'Notifications', icon: FiBell, path: '/notifications' },
-      { name: 'Settings', icon: FiSettings, path: '/settings' },
-      { name: 'Help Center', icon: FiHelpCircle, path: '/help' },
     ],
     DELIVERY_PARTNER: [
       { name: 'My Profile', icon: FiUser, path: '/profile' },
@@ -161,25 +154,18 @@ export default function MainLayout() {
       { name: 'My Orders', icon: FiShoppingBag, path: '/orders' },
       { name: 'My Wallet', icon: FiBriefcase, path: '/wallet' },
       { name: 'Notifications', icon: FiBell, path: '/notifications' },
-      { name: 'Settings', icon: FiSettings, path: '/settings' },
-      { name: 'Help Center', icon: FiHelpCircle, path: '/help' },
     ],
     CUSTOMER: [
       { name: 'My Profile', icon: FiUser, path: '/profile' },
-      { name: 'Become a Delivery Partner', icon: FiTruck, path: '/delivery/register' },
       { name: 'My Orders', icon: FiShoppingBag, path: '/orders' },
       { name: 'My Addresses', icon: FiMapPin, path: '/addresses' },
       { name: 'My Wallet', icon: FiBriefcase, path: '/wallet' },
       { name: 'Notifications', icon: FiBell, path: '/notifications' },
-      { name: 'Track Order', icon: FiTruck, path: '/tracking' },
-      { name: 'Payment Methods', icon: FiCreditCard, path: '/payment-methods' },
-      { name: 'Settings', icon: FiSettings, path: '/settings' },
-      { name: 'Help Center', icon: FiHelpCircle, path: '/help' },
     ],
   };
 
   const profileLinks = profileLinksByRole[user?.role] || profileLinksByRole.CUSTOMER;
-  const quickLinks = profileLinks.filter((link) => ['Track Order', 'Payment Methods', 'Settings', 'Help Center'].includes(link.name));
+  const mobileAccountLinks = profileLinks.filter((link) => link.path !== location.pathname);
 
   const openProfileMenu = () => {
     if (profileCloseTimerRef.current) {
@@ -326,7 +312,7 @@ export default function MainLayout() {
                             <Link
                               key={link.path || link.name}
                               to={link.path}
-                              className={`flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors ${index > 0 && ['Settings', 'Help Center', 'Track Order', 'Payment Methods'].includes(link.name) ? 'border-t border-gray-100 mt-2 pt-3' : ''}`}
+                              className={`flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors ${index === 1 ? 'border-t border-gray-100 mt-1 pt-3' : ''}`}
                               onClick={() => setIsProfileOpen(false)}
                             >
                               <link.icon className="w-4 h-4 mr-3" />
@@ -402,7 +388,7 @@ export default function MainLayout() {
                   );
                 })}
                 <div className="border-t border-gray-100 my-2 pt-2">
-                  {quickLinks.map((link) => (
+                  {mobileAccountLinks.map((link) => (
                     <Link
                       key={link.name}
                       to={link.path}
