@@ -108,13 +108,13 @@ export default function AuthLayout() {
 
   return (
     <div
-      className="h-screen overflow-hidden bg-cover bg-center"
+      className="min-h-screen overflow-y-auto bg-cover bg-center"
       style={{
         backgroundImage: 'linear-gradient(115deg, rgba(15, 23, 42, 0.90), rgba(31, 41, 55, 0.76)), url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=85)',
       }}
     >
-      <div className="container mx-auto h-full px-4">
-        <div className="flex h-full flex-col lg:flex-row">
+      <div className="container mx-auto min-h-screen px-4 py-6 lg:py-8">
+        <div className="flex min-h-[calc(100vh-3rem)] flex-col lg:min-h-[calc(100vh-4rem)] lg:flex-row">
           {/* Left Side - Brand Section */}
           <div className="hidden lg:flex lg:w-1/2 flex-col justify-center p-8 lg:p-10">
             {/* Logo */}
@@ -243,11 +243,11 @@ export default function AuthLayout() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex h-full items-center justify-center p-4 lg:w-1/2 lg:p-6"
+            className="flex items-center justify-center p-3 lg:w-1/2 lg:p-5"
           >
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-[420px]">
               {/* Form Container */}
-              <div className="rounded-2xl border border-white/25 bg-white/15 p-6 shadow-2xl backdrop-blur-xl lg:p-7">
+              <div className="rounded-2xl border border-white/25 bg-white/15 p-5 shadow-2xl backdrop-blur-xl lg:p-6">
                 <Outlet />
               </div>
 

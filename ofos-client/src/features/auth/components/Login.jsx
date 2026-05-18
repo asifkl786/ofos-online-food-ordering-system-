@@ -42,11 +42,11 @@ export default function Login() {
 
   return (
     <div className="w-full">
-      <div className="mb-5 text-center">
-        <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-r from-orange-500 to-red-500 shadow-lg">
-          <span className="text-xl font-bold text-white">OF</span>
+      <div className="mb-4 text-center">
+        <div className="mb-2 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-r from-orange-500 to-red-500 shadow-lg">
+          <span className="text-lg font-bold text-white">OF</span>
         </div>
-        <h2 className="text-2xl font-extrabold text-white">Welcome Back</h2>
+        <h2 className="text-xl font-extrabold text-white">Welcome Back</h2>
         <p className="mt-1 text-sm text-white/75">Sign in to continue your food journey</p>
       </div>
 
@@ -56,7 +56,7 @@ export default function Login() {
         onSubmit={handleSubmit}
       >
         {({ isSubmitting, values, handleChange, handleBlur, touched, errors }) => (
-          <Form className="space-y-4">
+          <Form className="space-y-3">
             <Input
               label="Email Address"
               name="email"
@@ -68,7 +68,7 @@ export default function Login() {
               onBlur={handleBlur}
               error={touched.email && errors.email}
               showSuccess={false}
-              className="py-2 text-sm"
+              className="py-1.5 text-sm"
             />
 
             <Input
@@ -96,10 +96,10 @@ export default function Login() {
               onBlur={handleBlur}
               error={touched.password && errors.password}
               showSuccess={false}
-              className="py-2 text-sm"
+              className="py-1.5 text-sm"
             />
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center">
                 <input
                   id="remember-me"
@@ -136,14 +136,14 @@ export default function Login() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                className="flex w-full items-center justify-center rounded-md border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur hover:bg-white/20"
+                className="flex w-full items-center justify-center rounded-md border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-medium text-white shadow-sm backdrop-blur hover:bg-white/20"
               >
                 <img src="https://www.google.com/favicon.ico" alt="Google" className="mr-2 h-5 w-5" />
                 Google
               </button>
               <button
                 type="button"
-                className="flex w-full items-center justify-center rounded-md border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur hover:bg-white/20"
+                className="flex w-full items-center justify-center rounded-md border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-medium text-white shadow-sm backdrop-blur hover:bg-white/20"
               >
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" className="mr-2 h-5 w-5" />
                 Facebook
@@ -153,7 +153,7 @@ export default function Login() {
         )}
       </Formik>
 
-      <p className="mt-5 text-center text-sm text-white/75">
+      <p className="mt-4 text-center text-sm text-white/75">
         Don't have an account?{' '}
         <Link to="/register" className="font-medium text-orange-600 hover:text-orange-500">
           Sign up now
