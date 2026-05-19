@@ -12,6 +12,7 @@ import com.ofos.exception.ResourceNotFoundException;
 import com.ofos.repository.UserRepository;
 import com.ofos.repository.WalletRepository;
 import com.ofos.service.UserService;
+import com.ofos.utils.EmailValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse registerUser(UserRegistrationRequest request) {
         log.info("Registering new user with email: {}", request.getEmail());
+        EmailValidationUtil.rejectKnownDomainTypos(request.getEmail());
         
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {

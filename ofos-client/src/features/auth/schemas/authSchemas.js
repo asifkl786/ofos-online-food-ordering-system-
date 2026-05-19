@@ -6,6 +6,27 @@ import * as yup from 'yup';
 const phoneRegex = /^[0-9]{10}$/;
 const nameRegex = /^[A-Za-z\s]{2,50}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/;
+const emailDomainTypos = {
+  'gmil.com': 'gmail.com',
+  'gmai.com': 'gmail.com',
+  'gmial.com': 'gmail.com',
+  'gmal.com': 'gmail.com',
+  'gmail.co': 'gmail.com',
+  'gmail.con': 'gmail.com',
+  'yaho.com': 'yahoo.com',
+  'yahoo.co': 'yahoo.com',
+  'hotmial.com': 'hotmail.com',
+  'hotmai.com': 'hotmail.com',
+  'outlok.com': 'outlook.com',
+  'outlook.co': 'outlook.com',
+};
+
+const getEmailDomainTypoMessage = (value) => {
+  if (!value || !value.includes('@')) return null;
+  const domain = value.split('@').pop().toLowerCase().trim();
+  const suggestion = emailDomainTypos[domain];
+  return suggestion ? `Email domain typo: use ${suggestion} instead of ${domain}` : null;
+};
 
 // ============================================
 // ERROR MESSAGES
@@ -75,6 +96,10 @@ export const registerSchema = yup.object().shape({
     .string()
     .required(errorMessages.email.required)
     .email(errorMessages.email.email)
+    .test('known-email-domain-typo', 'Please correct the email domain', function (value) {
+      const message = getEmailDomainTypoMessage(value);
+      return !message || this.createError({ message });
+    })
     .lowercase()
     .trim(),
   
@@ -117,7 +142,11 @@ export const loginSchema = yup.object().shape({
   email: yup
     .string()
     .required('📧 Email is required')
-    .email('📧 Please enter a valid email address'),
+    .email('📧 Please enter a valid email address')
+    .test('known-email-domain-typo', 'Please correct the email domain', function (value) {
+      const message = getEmailDomainTypoMessage(value);
+      return !message || this.createError({ message });
+    }),
   password: yup
     .string()
     .required('🔒 Password is required')

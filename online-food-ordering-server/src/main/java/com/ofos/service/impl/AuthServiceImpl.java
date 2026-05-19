@@ -15,6 +15,7 @@ import com.ofos.repository.UserRepository;
 import com.ofos.repository.WalletRepository;
 import com.ofos.service.AuthService;
 import com.ofos.service.TokenBlacklistService;
+import com.ofos.utils.EmailValidationUtil;
 import com.ofos.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public AuthResponse register(UserRegistrationRequest request) {
         log.info("Registering new user with email: {}", request.getEmail());
+        EmailValidationUtil.rejectKnownDomainTypos(request.getEmail());
         
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
