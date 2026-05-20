@@ -115,6 +115,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public MenuItemResponse getMenuItemById(Long id) {
         log.debug("Fetching menu item by id: {}", id);
         MenuItem menuItem = menuItemRepository.findById(id)
@@ -123,6 +124,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<MenuItemResponse> getAllMenuItems(Pageable pageable) {
         log.debug("Fetching all menu items for admin");
         return menuItemRepository.findAllByOrderByCreatedAtDesc(pageable)
@@ -130,6 +132,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<MenuItemResponse> getMenuItemsByRestaurant(Long restaurantId, int page, int size) {
         log.debug("Fetching menu items for restaurant: {}", restaurantId);
         Pageable pageable = PageRequest.of(page, size);
@@ -138,6 +141,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<MenuItemResponse> getAvailableMenuItemsByRestaurant(Long restaurantId, int page, int size) {
         log.debug("Fetching available menu items for restaurant: {}", restaurantId);
         Pageable pageable = PageRequest.of(page, size);
@@ -146,6 +150,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<MenuItemResponse> searchMenuItems(Long restaurantId, String keyword, int page, int size) {
         log.debug("Searching menu items with keyword: {} for restaurant: {}", keyword, restaurantId);
         Pageable pageable = PageRequest.of(page, size);
@@ -154,6 +159,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<MenuItemResponse> getMenuItemsByCategory(Long restaurantId, Long categoryId) {
         log.debug("Fetching menu items by category: {} for restaurant: {}", categoryId, restaurantId);
         return menuItemRepository.findByRestaurantIdAndCategoryId(restaurantId, categoryId)
@@ -163,6 +169,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<MenuItemResponse> getDiscountedMenuItems(Long restaurantId) {
         log.debug("Fetching discounted menu items for restaurant: {}", restaurantId);
         return menuItemRepository.findDiscountedItems(restaurantId)
@@ -205,6 +212,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<MenuItemResponse> getVegetarianMenuItems(Long restaurantId) {
         log.debug("Fetching vegetarian menu items for restaurant: {}", restaurantId);
         return menuItemRepository.findByRestaurantIdAndIsVegetarianTrue(restaurantId)
@@ -214,6 +222,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<MenuItemResponse> getMenuItemsByPriceRange(Long restaurantId, BigDecimal minPrice, BigDecimal maxPrice) {
         log.debug("Fetching menu items by price range for restaurant: {}", restaurantId);
         return menuItemRepository.findMenuItemsByPriceRange(restaurantId, minPrice, maxPrice)
