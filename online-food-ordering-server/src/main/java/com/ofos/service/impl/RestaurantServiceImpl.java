@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ofos.dto.request.RestaurantRequest;
+import com.ofos.dto.request.RestaurantAddressRequest;
 import com.ofos.dto.request.RestaurantSearchRequest;
 import com.ofos.dto.request.RestaurantUpdateRequest;
 import com.ofos.dto.response.RestaurantAddressResponse;
@@ -119,6 +120,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         if (request.getContactPhone() != null) restaurant.setContactPhone(request.getContactPhone());
         if (request.getContactEmail() != null) restaurant.setContactEmail(request.getContactEmail());
         if (request.getWebsite() != null) restaurant.setWebsite(request.getWebsite());
+        if (request.getAddress() != null) updatePrimaryAddress(restaurant, request.getAddress());
         
         Restaurant updatedRestaurant = restaurantRepository.save(restaurant);
         log.info("Restaurant updated successfully: {}", updatedRestaurant.getId());
@@ -255,6 +257,27 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
         
         return restaurant;
+    }
+
+    private void updatePrimaryAddress(Restaurant restaurant, RestaurantAddressRequest request) {
+        RestaurantAddress address = addressRepository.findByRestaurantIdAndIsPrimaryTrue(restaurant.getId())
+                .orElseGet(() -> {
+                    RestaurantAddress newAddress = new RestaurantAddress();
+                    newAddress.setRestaurant(restaurant);
+                    newAddress.setIsPrimary(true);
+                    return newAddress;
+                });
+
+        if (request.getStreetAddress() != null) address.setStreetAddress(request.getStreetAddress());
+        if (request.getLandmark() != null) address.setLandmark(request.getLandmark());
+        if (request.getCity() != null) address.setCity(request.getCity());
+        if (request.getState() != null) address.setState(request.getState());
+        if (request.getZipCode() != null) address.setZipCode(request.getZipCode());
+        if (request.getCountry() != null) address.setCountry(request.getCountry());
+        if (request.getLatitude() != null) address.setLatitude(request.getLatitude());
+        if (request.getLongitude() != null) address.setLongitude(request.getLongitude());
+
+        addressRepository.save(address);
     }
     
     private RestaurantResponse convertToResponse(Restaurant restaurant) {

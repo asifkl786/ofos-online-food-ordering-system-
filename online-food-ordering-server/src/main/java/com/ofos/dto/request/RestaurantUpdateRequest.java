@@ -20,4 +20,5 @@ public class RestaurantUpdateRequest {
     private String contactPhone;
     private String contactEmail;
     private String website;
+    private RestaurantAddressRequest address;
 }
