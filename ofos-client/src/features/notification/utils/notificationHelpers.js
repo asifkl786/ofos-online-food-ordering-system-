@@ -1,10 +1,21 @@
+const parseNotificationDate = (dateString) => {
+  if (!dateString) return null;
+
+  // Backend sends LocalDateTime without timezone. Render/Postgres stores it in UTC,
+  // so append Z only when the timestamp has no explicit timezone.
+  const hasTimezone = /([zZ]|[+-]\d{2}:?\d{2})$/.test(dateString);
+  const normalizedDate = hasTimezone ? dateString : `${dateString}Z`;
+  const date = new Date(normalizedDate);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
 // Format notification time (e.g., "2 min ago", "1 hour ago", "Yesterday")
 export const formatNotificationTime = (dateString) => {
-  if (!dateString) return 'Just now';
-  
-  const date = new Date(dateString);
+  const date = parseNotificationDate(dateString);
+  if (!date) return 'Just now';
+
   const now = new Date();
-  const diffMs = now - date;
+  const diffMs = Math.max(0, now - date);
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
@@ -16,6 +27,21 @@ export const formatNotificationTime = (dateString) => {
   if (diffDays < 7) return `${diffDays} days ago`;
   
   return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+};
+
+export const formatNotificationDateTime = (dateString) => {
+  const date = parseNotificationDate(dateString);
+  if (!date) return '';
+
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata',
+  });
 };
 
 // Get notification icon based on type

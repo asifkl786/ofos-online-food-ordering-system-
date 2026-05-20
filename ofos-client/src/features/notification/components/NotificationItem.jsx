@@ -1,4 +1,10 @@
-import { formatNotificationTime, getNotificationIcon, getNotificationColor, getNotificationTypeLabel } from '../utils/notificationHelpers';
+import {
+  formatNotificationDateTime,
+  formatNotificationTime,
+  getNotificationIcon,
+  getNotificationColor,
+  getNotificationTypeLabel,
+} from '../utils/notificationHelpers';
 import { FiX } from 'react-icons/fi';
 
 export default function NotificationItem({ notification, onMarkAsRead, onDelete }) {
@@ -6,6 +12,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onDelete 
   const icon = getNotificationIcon(notification.type);
   const colorClass = getNotificationColor(notification.type);
   const timeAgo = formatNotificationTime(notification.createdAt);
+  const exactTime = formatNotificationDateTime(notification.createdAt);
   const typeLabel = getNotificationTypeLabel(notification.type);
 
   const handleClick = () => {
@@ -35,7 +42,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onDelete 
             </p>
             <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{notification.message}</p>
             <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-xs text-gray-400">{timeAgo}</span>
+              <span className="text-xs text-gray-400" title={exactTime}>{timeAgo}</span>
               <span className="text-xs text-gray-300">•</span>
               <span className="text-xs text-gray-400">{typeLabel}</span>
             </div>
