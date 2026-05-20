@@ -129,6 +129,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public RestaurantResponse getRestaurantById(Long id) {
         log.debug("Fetching restaurant by id: {}", id);
         Restaurant restaurant = restaurantRepository.findById(id)
@@ -137,6 +138,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<RestaurantResponse> getAllRestaurants(int page, int size, String sortBy, String sortDirection) {
         log.debug("Fetching all restaurants with pagination");
         
@@ -147,6 +149,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Long getOwnerIdByEmail(String ownerEmail) {
         User owner = userRepository.findByEmail(ownerEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -154,6 +157,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<RestaurantResponse> getRestaurantsByOwner(Long ownerId, int page, int size) {
         log.debug("Fetching restaurants for owner: {}", ownerId);
         // Check if owner exists
@@ -166,6 +170,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<RestaurantResponse> searchRestaurants(String keyword, int page, int size) {
         log.debug("Searching restaurants with keyword: {}", keyword);
         Pageable pageable = PageRequest.of(page, size);
@@ -173,6 +178,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<RestaurantResponse> filterRestaurants(RestaurantSearchRequest request) {
         log.debug("Filtering restaurants with criteria");
         
@@ -226,11 +232,13 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Long getTotalOrdersCount(Long restaurantId) {
         return restaurantRepository.countCompletedOrders(restaurantId);
     }
     
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal getTotalRevenue(Long restaurantId) {
         return restaurantRepository.calculateTotalRevenue(restaurantId);
     }
