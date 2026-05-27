@@ -61,6 +61,9 @@ public class SecurityConfig {
                 .requestMatchers("/restaurants/filter").permitAll()
                 .requestMatchers("/restaurants/{id}/stats").permitAll()
                 .requestMatchers("/restaurants/{id}").permitAll()
+
+                // Public category reads are used by customer menu filters and owner menu forms.
+                .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                 
                // âœ… PUBLIC Menu endpoints (GET requests only)
                 .requestMatchers("/menu/**").permitAll()

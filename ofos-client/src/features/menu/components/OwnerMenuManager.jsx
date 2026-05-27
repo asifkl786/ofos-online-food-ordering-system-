@@ -51,11 +51,14 @@ export default function OwnerMenuManager({ restaurant, isOpen, onClose }) {
     if (!restaurantId) return;
     setLoading(true);
     try {
-      const [menuResponse, categoryResponse] = await Promise.all([
-        menuService.getMenuItemsByRestaurant(restaurantId, 0, 100),
-        menuService.getActiveCategories(),
-      ]);
-      const categoryData = categoryResponse.data?.data;
+      const menuResponse = await menuService.getMenuItemsByRestaurant(restaurantId, 0, 100);
+      let categoryResponse = null;
+      try {
+        categoryResponse = await menuService.getActiveCategories();
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Categories load nahi ho pa rahi, menu items phir bhi show honge');
+      }
+      const categoryData = categoryResponse?.data?.data;
       setItems(menuResponse.data?.data?.content || []);
       setCategories(Array.isArray(categoryData) ? categoryData : categoryData?.content || []);
     } catch (error) {
