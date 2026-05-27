@@ -75,6 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
@@ -82,6 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll().stream()
                 .map(this::convertToResponse)
@@ -89,6 +91,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getActiveCategories() {
         return categoryRepository.findByIsActiveTrue().stream()
                 .map(this::convertToResponse)
@@ -96,6 +99,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getParentCategories() {
         return categoryRepository.findByParentCategoryIsNull().stream()
                 .map(this::convertToResponse)
@@ -103,6 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getSubCategories(Long parentId) {
         return categoryRepository.findByParentCategoryId(parentId).stream()
                 .map(this::convertToResponse)
