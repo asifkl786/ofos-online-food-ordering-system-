@@ -9,7 +9,6 @@ import com.ofos.repository.CategoryRepository;
 import com.ofos.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     
     private final CategoryRepository categoryRepository;
-    private final ModelMapper modelMapper;
     
     @Override
     @Transactional
@@ -142,7 +140,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     private CategoryResponse convertToResponse(Category category) {
-        CategoryResponse response = modelMapper.map(category, CategoryResponse.class);
+        CategoryResponse response = new CategoryResponse();
+        response.setId(category.getId());
+        response.setName(category.getName());
+        response.setDescription(category.getDescription());
+        response.setImageUrl(category.getImageUrl());
+        response.setDisplayOrder(category.getDisplayOrder());
+        response.setIsActive(category.getIsActive());
         
         if (category.getParentCategory() != null) {
             response.setParentCategoryId(category.getParentCategory().getId());
