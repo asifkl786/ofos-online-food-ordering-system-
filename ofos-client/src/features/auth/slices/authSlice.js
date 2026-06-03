@@ -94,20 +94,23 @@ export const changePassword = createAsyncThunk(
 
 export const logout = createAsyncThunk(
   'auth/logout',
-  async (_, { getState, rejectWithValue }) => {
+  async () => {
+    const accessToken = localStorage.getItem('accessToken');
     try {
-      const accessToken = localStorage.getItem('accessToken');
       if (accessToken) {
         await authService.logout(accessToken);
       }
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
-      toast.success('Logged out successfully');
-      return true;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message);
+      // Logout must always clear the browser session, even when the server
+      // rejects an old/expired token or the network request fails.
+      console.debug('Server logout failed, clearing local session anyway', error);
     }
+
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    toast.success('Logged out successfully');
+    return true;
   }
 );
 

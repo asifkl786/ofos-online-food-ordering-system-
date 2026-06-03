@@ -20,7 +20,6 @@ import {
   FiBriefcase
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
 import CartIcon from '../../features/cart/components/CartIcon';
 import NotificationBell from '../../features/notification/components/NotificationBell';
 
@@ -100,7 +99,6 @@ export default function MainLayout() {
   const handleLogout = async () => {
     setIsProfileOpen(false);
     await logout();
-    toast.success('Logged out successfully');
     navigate('/login');
   };
 

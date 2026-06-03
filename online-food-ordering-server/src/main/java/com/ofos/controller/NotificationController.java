@@ -15,6 +15,7 @@ import com.ofos.service.NotificationStreamService;
 import com.ofos.service.TokenBlacklistService;
 import com.ofos.service.impl.CustomUserDetailsService;
 import com.ofos.utils.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -98,19 +99,36 @@ public class NotificationController {
         // EventSource cannot send Authorization headers in the browser, so this stream validates the JWT query token explicitly.
         String normalizedToken = token.startsWith("Bearer ") ? token.substring(7) : token;
         if (tokenBlacklistService.isInvalidated(normalizedToken)) {
-            throw new BusinessException("Token has been invalidated");
+            return invalidTokenStream();
         }
 
-        String email = jwtUtil.extractUsername(normalizedToken);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        if (!jwtUtil.validateToken(normalizedToken, userDetails)) {
-            throw new BusinessException("Invalid token");
+        String email;
+        try {
+            email = jwtUtil.extractUsername(normalizedToken);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            if (!jwtUtil.validateToken(normalizedToken, userDetails)) {
+                return invalidTokenStream();
+            }
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.debug("Rejecting notification stream with invalid JWT");
+            return invalidTokenStream();
         }
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return notificationStreamService.subscribe(user.getId());
+    }
+
+    private SseEmitter invalidTokenStream() {
+        SseEmitter emitter = new SseEmitter(0L);
+        try {
+            emitter.send(SseEmitter.event().name("auth-error").data("Invalid or expired token"));
+        } catch (Exception ignored) {
+        } finally {
+            emitter.complete();
+        }
+        return emitter;
     }
     
     @GetMapping("/{notificationId}")
