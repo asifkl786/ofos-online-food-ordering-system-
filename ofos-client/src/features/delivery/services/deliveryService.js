@@ -29,7 +29,7 @@ export const deliveryService = {
 
   // Assign partner to order (Restaurant Owner)
   assignPartner: (orderId, partnerId) => {
-    return api.post('/delivery/assign', { orderId, deliveryPartnerId: partnerId });
+    return api.post(`/orders/${orderId}/assign-delivery`, { orderId, deliveryPartnerId: partnerId });
   },
 
   // Update assignment status (Delivery Partner)

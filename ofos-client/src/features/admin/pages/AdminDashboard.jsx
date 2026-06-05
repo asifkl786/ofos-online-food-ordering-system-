@@ -61,6 +61,17 @@ const defaultFilters = {
   auditLogs: { search: '', status: 'ALL', method: 'ALL' },
 };
 
+const unwrapApiData = (response) => response?.data?.data ?? response?.data ?? null;
+const getSettledData = (results, key) => (
+  results[key]?.status === 'fulfilled' ? unwrapApiData(results[key].value) : null
+);
+const getSettledPage = (results, key) => getSettledData(results, key) || {};
+const getSettledList = (results, key) => {
+  const data = getSettledData(results, key);
+  if (Array.isArray(data)) return data;
+  return data?.content || [];
+};
+
 const formatCurrency = (value) => new Intl.NumberFormat('en-IN', {
   style: 'currency',
   currency: 'INR',
@@ -174,48 +185,46 @@ export default function AdminDashboard() {
   const loadDashboard = async (nextPagination = pagination) => {
     if (!summary) setLoading(true);
     try {
-      const [
-        summaryRes,
-        usersRes,
-        restaurantsRes,
-        ordersRes,
-        menuRes,
-        categoryRes,
-        deliveryRes,
-        paymentRes,
-        walletRes,
-        reviewRes,
-        auditRes,
-      ] = await Promise.all([
-        adminService.getSummary(),
-        adminService.getUsers(nextPagination.users.page, nextPagination.users.size),
-        adminService.getRestaurants(nextPagination.restaurants.page, nextPagination.restaurants.size),
-        adminService.getOrders(nextPagination.orders.page, nextPagination.orders.size),
-        adminService.getMenuItems(nextPagination.menuItems.page, nextPagination.menuItems.size),
-        adminService.getCategories(),
-        adminService.getDeliveryPartners(nextPagination.deliveryPartners.page, nextPagination.deliveryPartners.size),
-        adminService.getPayments(nextPagination.payments.page, nextPagination.payments.size),
-        adminService.getWalletTransactions(nextPagination.walletTransactions.page, nextPagination.walletTransactions.size),
-        adminService.getReviews(nextPagination.reviews.page, nextPagination.reviews.size),
-        adminService.getAuditLogs(nextPagination.auditLogs.page, nextPagination.auditLogs.size, filters.auditLogs),
-      ]);
+      const summaryRes = await adminService.getSummary();
+      setSummary(unwrapApiData(summaryRes) || {});
 
-      const usersPage = usersRes.data.data || {};
-      const restaurantsPage = restaurantsRes.data.data || {};
-      const ordersPage = ordersRes.data.data || {};
-      const menuPage = menuRes.data.data || {};
-      const deliveryPage = deliveryRes.data.data || {};
-      const paymentPage = paymentRes.data.data || {};
-      const walletPage = walletRes.data.data || {};
-      const reviewPage = reviewRes.data.data || {};
-      const auditPage = auditRes.data.data || {};
+      const requests = {
+        users: adminService.getUsers(nextPagination.users.page, nextPagination.users.size),
+        restaurants: adminService.getRestaurants(nextPagination.restaurants.page, nextPagination.restaurants.size),
+        orders: adminService.getOrders(nextPagination.orders.page, nextPagination.orders.size),
+        menuItems: adminService.getMenuItems(nextPagination.menuItems.page, nextPagination.menuItems.size),
+        categories: adminService.getCategories(),
+        deliveryPartners: adminService.getDeliveryPartners(nextPagination.deliveryPartners.page, nextPagination.deliveryPartners.size),
+        payments: adminService.getPayments(nextPagination.payments.page, nextPagination.payments.size),
+        walletTransactions: adminService.getWalletTransactions(nextPagination.walletTransactions.page, nextPagination.walletTransactions.size),
+        reviews: adminService.getReviews(nextPagination.reviews.page, nextPagination.reviews.size),
+        auditLogs: adminService.getAuditLogs(nextPagination.auditLogs.page, nextPagination.auditLogs.size, filters.auditLogs),
+      };
+      const resultEntries = await Promise.allSettled(Object.values(requests));
+      const results = Object.fromEntries(Object.keys(requests).map((key, index) => [key, resultEntries[index]]));
 
-      setSummary(summaryRes.data.data);
+      const failedSections = Object.entries(results)
+        .filter(([, result]) => result.status === 'rejected')
+        .map(([key]) => key);
+      if (failedSections.length) {
+        toast.error(`Could not load: ${failedSections.join(', ')}`);
+      }
+
+      const usersPage = getSettledPage(results, 'users');
+      const restaurantsPage = getSettledPage(results, 'restaurants');
+      const ordersPage = getSettledPage(results, 'orders');
+      const menuPage = getSettledPage(results, 'menuItems');
+      const deliveryPage = getSettledPage(results, 'deliveryPartners');
+      const paymentPage = getSettledPage(results, 'payments');
+      const walletPage = getSettledPage(results, 'walletTransactions');
+      const reviewPage = getSettledPage(results, 'reviews');
+      const auditPage = getSettledPage(results, 'auditLogs');
+
       setUsers(usersPage.content || []);
       setRestaurants(restaurantsPage.content || []);
       setOrders(ordersPage.content || []);
       setMenuItems(menuPage.content || []);
-      setCategories(categoryRes.data.data || []);
+      setCategories(getSettledList(results, 'categories'));
       setDeliveryPartners(deliveryPage.content || []);
       setPayments(paymentPage.content || []);
       setWalletTransactions(walletPage.content || []);
