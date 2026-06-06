@@ -2,10 +2,14 @@ package com.ofos.service;
 
 import com.ofos.dto.request.LoginRequest;
 import com.ofos.dto.request.LogoutRequest;
+import com.ofos.dto.request.ForgotPasswordRequest;
 import com.ofos.dto.request.RefreshTokenRequest;
+import com.ofos.dto.request.ResetPasswordRequest;
 import com.ofos.dto.request.UserRegistrationRequest;
 import com.ofos.dto.response.AuthResponse;
 import com.ofos.dto.response.JwtResponse;
+
+import java.util.Map;
 
 public interface AuthService {
     
@@ -16,6 +20,10 @@ public interface AuthService {
     JwtResponse refreshToken(RefreshTokenRequest request);
     
     void logout(LogoutRequest request);
+
+    Map<String, Object> requestPasswordReset(ForgotPasswordRequest request);
+
+    void resetPassword(ResetPasswordRequest request);
     
     void validateToken(String token);
     

@@ -11,6 +11,16 @@ export const authService = {
     return response.data;
   },
 
+  forgotPassword: async (email) => {
+    const response = await authEndpoints.forgotPassword({ email });
+    return response.data;
+  },
+
+  resetPassword: async (resetData) => {
+    const response = await authEndpoints.resetPassword(resetData);
+    return response.data;
+  },
+
   getProfile: async () => {
     const response = await authEndpoints.getProfile();
     return response.data;

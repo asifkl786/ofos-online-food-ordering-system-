@@ -1,16 +1,20 @@
 package com.ofos.service.impl;
 
+import com.ofos.dto.request.ForgotPasswordRequest;
 import com.ofos.dto.request.LoginRequest;
 import com.ofos.dto.request.LogoutRequest;
 import com.ofos.dto.request.RefreshTokenRequest;
+import com.ofos.dto.request.ResetPasswordRequest;
 import com.ofos.dto.request.UserRegistrationRequest;
 import com.ofos.dto.response.AuthResponse;
 import com.ofos.dto.response.JwtResponse;
 import com.ofos.dto.response.UserResponse;
+import com.ofos.entity.PasswordResetToken;
 import com.ofos.entity.User;
 import com.ofos.entity.UserRole;
 import com.ofos.entity.Wallet;
 import com.ofos.exception.BusinessException;
+import com.ofos.repository.PasswordResetTokenRepository;
 import com.ofos.repository.UserRepository;
 import com.ofos.repository.WalletRepository;
 import com.ofos.service.AuthService;
@@ -19,6 +23,9 @@ import com.ofos.utils.EmailValidationUtil;
 import com.ofos.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +37,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +48,25 @@ public class AuthServiceImpl implements AuthService {
     
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final TokenBlacklistService tokenBlacklistService;
+    private final JavaMailSender javaMailSender;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
+    @Value("${email.enabled:false}")
+    private boolean emailEnabled;
+
+    @Value("${app.password-reset.expiry-minutes:30}")
+    private long passwordResetExpiryMinutes;
+
+    @Value("${app.password-reset.expose-token:true}")
+    private boolean exposePasswordResetToken;
     
     @Override
     @Transactional
@@ -189,6 +213,57 @@ public class AuthServiceImpl implements AuthService {
         // Clear security context
         SecurityContextHolder.clearContext();
     }
+
+    @Override
+    @Transactional
+    public Map<String, Object> requestPasswordReset(ForgotPasswordRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        userRepository.findByEmail(request.getEmail()).ifPresent(user -> {
+            passwordResetTokenRepository.deleteByUser(user);
+
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken resetToken = new PasswordResetToken();
+            resetToken.setUser(user);
+            resetToken.setToken(token);
+            resetToken.setExpiresAt(LocalDateTime.now().plusMinutes(passwordResetExpiryMinutes));
+            resetToken.setUsed(false);
+            passwordResetTokenRepository.save(resetToken);
+
+            String resetUrl = buildResetUrl(token);
+            boolean emailSent = sendPasswordResetEmail(user, resetUrl);
+            response.put("emailSent", emailSent);
+            response.put("expiresInMinutes", passwordResetExpiryMinutes);
+
+            if (exposePasswordResetToken || !emailSent) {
+                response.put("resetToken", token);
+                response.put("resetUrl", resetUrl);
+            }
+        });
+
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenAndUsedFalse(request.getToken())
+                .orElseThrow(() -> new BusinessException("Invalid or expired reset link"));
+
+        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            resetToken.setUsed(true);
+            passwordResetTokenRepository.save(resetToken);
+            throw new BusinessException("Reset link has expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+        log.info("Password reset successfully for user: {}", user.getEmail());
+    }
     
     @Override
     public void validateToken(String token) {
@@ -215,6 +290,33 @@ public class AuthServiceImpl implements AuthService {
             validateToken(token);
             return true;
         } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String buildResetUrl(String token) {
+        String baseUrl = frontendUrl == null || frontendUrl.isBlank() ? "http://localhost:5173" : frontendUrl;
+        return baseUrl.replaceAll("/+$", "") + "/reset-password/" + token;
+    }
+
+    private boolean sendPasswordResetEmail(User user, String resetUrl) {
+        if (!emailEnabled) {
+            log.info("Email is disabled. Password reset link generated for user: {}", user.getEmail());
+            return false;
+        }
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(user.getEmail());
+            message.setSubject("Reset your Online Food password");
+            message.setText("Hello " + user.getFirstName() + ",\n\n"
+                    + "Use this link to reset your password:\n" + resetUrl + "\n\n"
+                    + "This link will expire in " + passwordResetExpiryMinutes + " minutes.\n\n"
+                    + "If you did not request this, you can ignore this email.");
+            javaMailSender.send(message);
+            return true;
+        } catch (Exception e) {
+            log.warn("Failed to send password reset email to {}: {}", user.getEmail(), e.getMessage());
             return false;
         }
     }

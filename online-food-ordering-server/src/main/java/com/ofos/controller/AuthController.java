@@ -1,8 +1,10 @@
 package com.ofos.controller;
 
+import com.ofos.dto.request.ForgotPasswordRequest;
 import com.ofos.dto.request.LoginRequest;
 import com.ofos.dto.request.LogoutRequest;
 import com.ofos.dto.request.RefreshTokenRequest;
+import com.ofos.dto.request.ResetPasswordRequest;
 import com.ofos.dto.request.UserRegistrationRequest;
 import com.ofos.dto.response.ApiResponse;
 import com.ofos.dto.response.AuthResponse;
@@ -54,6 +56,24 @@ public class AuthController {
         log.info("Recived REST request to login user: {}", request.getEmail());
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Request a password reset link")
+    public ResponseEntity<ApiResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        log.info("REST request to reset password for email: {}", request.getEmail());
+        return ResponseEntity.ok(ApiResponse.success(
+                "If this email is registered, password reset instructions have been sent",
+                authService.requestPasswordReset(request)
+        ));
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Reset password using reset token")
+    public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        log.info("REST request to update password using reset token");
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Password reset successfully", null));
     }
     
     @PostMapping("/refresh")
