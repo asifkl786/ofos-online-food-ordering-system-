@@ -29,6 +29,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
+
+    private static final String[] PUBLIC_AUTH_PATHS = {
+            "/auth/register",
+            "/auth/admin/register",
+            "/auth/login",
+            "/auth/refresh",
+            "/auth/logout",
+            "/auth/forgot-password",
+            "/auth/reset-password",
+            "/auth/validate"
+    };
     
     @Override
     protected void doFilterInternal(
@@ -41,6 +52,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response); // request ko aage pass kar do
             return; // yahi pe stop
+        }
+
+        if (isPublicAuthRequest(request)) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
         final String authHeader = request.getHeader("Authorization");
@@ -84,5 +100,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Continue filter chain
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicAuthRequest(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (contextPath != null && !contextPath.isBlank() && path.startsWith(contextPath)) {
+            path = path.substring(contextPath.length());
+        }
+
+        for (String publicPath : PUBLIC_AUTH_PATHS) {
+            if (path.equals(publicPath)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
