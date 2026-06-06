@@ -59,8 +59,11 @@ public class AuthServiceImpl implements AuthService {
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
-    @Value("${email.enabled:false}")
+    @Value("${notification.email.enabled:false}")
     private boolean emailEnabled;
+
+    @Value("${spring.mail.from:no-reply@example.com}")
+    private String mailFrom;
 
     @Value("${app.password-reset.expiry-minutes:30}")
     private long passwordResetExpiryMinutes;
@@ -307,6 +310,7 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(mailFrom);
             message.setTo(user.getEmail());
             message.setSubject("Reset your Online Food password");
             message.setText("Hello " + user.getFirstName() + ",\n\n"

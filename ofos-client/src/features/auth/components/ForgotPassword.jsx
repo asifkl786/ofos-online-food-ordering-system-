@@ -25,7 +25,13 @@ export default function ForgotPassword() {
       const response = await authService.forgotPassword(email.trim());
       const data = response?.data || {};
       setResetUrl(data.resetUrl || '');
-      toast.success('Password reset request sent');
+      if (data.emailSent) {
+        toast.success('Reset link sent to your email');
+      } else if (data.resetUrl) {
+        toast.success('Email is not configured. Use the reset link shown below');
+      } else {
+        toast.success('Password reset request sent');
+      }
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Unable to send reset request');
     } finally {
