@@ -361,6 +361,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
     
     @Override
+    @Transactional
     public List<DeliveryAssignmentResponse> getPartnerAssignments(String userEmail) {
         log.debug("Fetching assignments for partner: {}", userEmail);
         
@@ -368,6 +369,26 @@ public class DeliveryServiceImpl implements DeliveryService {
         DeliveryPartner partner = deliveryPartnerRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Delivery partner not found"));
         
+        // Older assignment flows wrote only orders.delivery_partner_id.
+        // Backfill those active jobs so the rider dashboard always reads from delivery_assignments.
+        List<OrderStatus> activeOrderStatuses = List.of(OrderStatus.READY_FOR_PICKUP, OrderStatus.OUT_FOR_DELIVERY);
+        orderRepository.findByDeliveryPartnerAndStatusIn(user, activeOrderStatuses).forEach(order ->
+                assignmentRepository.findByOrderId(order.getId()).orElseGet(() -> {
+                    DeliveryAssignment assignment = new DeliveryAssignment();
+                    assignment.setOrder(order);
+                    assignment.setDeliveryPartner(partner);
+                    assignment.setAssignmentStatus(order.getStatus() == OrderStatus.OUT_FOR_DELIVERY
+                            ? AssignmentStatus.PICKED_UP
+                            : AssignmentStatus.PENDING);
+                    assignment.setAssignedAt(LocalDateTime.now());
+                    assignment.setDeliveryFee(order.getDeliveryFee());
+                    assignment.setTipAmount(BigDecimal.ZERO);
+                    assignment.setDistanceInKm(5.0);
+                    assignment.setEstimatedTimeInMinutes(calculateEstimatedTime(5.0));
+                    return assignmentRepository.save(assignment);
+                })
+        );
+
         // Dashboard needs both active and completed jobs so riders can see their delivery history.
         List<DeliveryAssignment> assignments = assignmentRepository.findByDeliveryPartnerId(partner.getId());
         
@@ -483,9 +504,12 @@ public class DeliveryServiceImpl implements DeliveryService {
         
         // Add restaurant details
         response.setRestaurantName(assignment.getOrder().getRestaurant().getName());
-        response.setRestaurantAddress(
-            assignment.getOrder().getRestaurant().getAddresses().get(0).getStreetAddress()
-        );
+        if (assignment.getOrder().getRestaurant().getAddresses() != null
+                && !assignment.getOrder().getRestaurant().getAddresses().isEmpty()) {
+            response.setRestaurantAddress(
+                assignment.getOrder().getRestaurant().getAddresses().get(0).getStreetAddress()
+            );
+        }
         
         return response;
     }

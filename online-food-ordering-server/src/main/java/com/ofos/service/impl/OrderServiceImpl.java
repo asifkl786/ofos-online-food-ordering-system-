@@ -40,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final MenuItemRepository menuItemRepository;
     private final DeliveryAssignmentRepository deliveryAssignmentRepository;
+    private final DeliveryPartnerRepository deliveryPartnerRepository;
     private final OrderNumberGenerator orderNumberGenerator;
     private final ModelMapper modelMapper;
     private final NotificationService notificationService;
@@ -245,6 +246,7 @@ public class OrderServiceImpl implements OrderService {
     // Other required methods...
     
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
         if (orderId == null) {
             throw new BusinessException("Order ID cannot be null");
@@ -255,6 +257,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getOrderByNumber(String orderNumber) {
         if (orderNumber == null || orderNumber.isEmpty()) {
             throw new BusinessException("Order number cannot be null or empty");
@@ -265,6 +268,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getUserOrders(String userEmail, Pageable pageable) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -273,6 +277,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getRestaurantOrders(Long restaurantId, Pageable pageable, String userEmail) {
         if (restaurantId == null) {
             throw new BusinessException("Restaurant ID cannot be null");
@@ -295,6 +300,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getOwnerOrders(String userEmail, Pageable pageable) {
         if (userEmail == null || userEmail.isBlank()) {
             throw new BusinessException("Owner email cannot be empty");
@@ -306,6 +312,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
         return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(this::convertToResponse);
@@ -379,22 +386,59 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         
-        User deliveryPartner = userRepository.findById(request.getDeliveryPartnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Delivery partner not found"));
-        
-        if (deliveryPartner.getRole() != UserRole.DELIVERY_PARTNER && deliveryPartner.getRole() != UserRole.ADMIN) {
+        DeliveryPartner deliveryPartner = deliveryPartnerRepository.findById(request.getDeliveryPartnerId())
+                .or(() -> deliveryPartnerRepository.findByUserId(request.getDeliveryPartnerId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Delivery partner profile not found"));
+        User deliveryPartnerUser = deliveryPartner.getUser();
+
+        if (deliveryPartnerUser == null
+                || (deliveryPartnerUser.getRole() != UserRole.DELIVERY_PARTNER && deliveryPartnerUser.getRole() != UserRole.ADMIN)) {
             throw new BusinessException("Selected user is not a delivery partner");
         }
+
+        deliveryAssignmentRepository.findByOrderId(order.getId()).ifPresent(existing -> {
+            if (!existing.getDeliveryPartner().getId().equals(deliveryPartner.getId())) {
+                throw new BusinessException("Delivery partner already assigned to this order");
+            }
+        });
+
+        deliveryAssignmentRepository.findByOrderId(order.getId()).orElseGet(() -> {
+            DeliveryAssignment assignment = new DeliveryAssignment();
+            assignment.setOrder(order);
+            assignment.setDeliveryPartner(deliveryPartner);
+            assignment.setAssignmentStatus(AssignmentStatus.PENDING);
+            assignment.setAssignedAt(LocalDateTime.now());
+            assignment.setDeliveryFee(order.getDeliveryFee());
+            assignment.setTipAmount(request.getTipAmount() != null ? request.getTipAmount() : BigDecimal.ZERO);
+            assignment.setDistanceInKm(5.0);
+            assignment.setEstimatedTimeInMinutes(10);
+            return deliveryAssignmentRepository.save(assignment);
+        });
         
-        order.setDeliveryPartner(deliveryPartner);
-        order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
+        order.setDeliveryPartner(deliveryPartnerUser);
+        order.setStatus(OrderStatus.READY_FOR_PICKUP);
         
         Order updatedOrder = orderRepository.save(order);
         
         OrderTracking tracking = orderTrackingRepository.findByOrderId(orderId)
                 .orElse(new OrderTracking());
-        tracking.setDeliveryPartnerPhone(deliveryPartner.getPhoneNumber());
+        tracking.setOrder(updatedOrder);
+        tracking.setCurrentStatus(OrderStatus.READY_FOR_PICKUP);
+        tracking.setLastUpdateTime(LocalDateTime.now());
+        if (tracking.getStatusHistory() == null) {
+            tracking.setStatusHistory(new java.util.HashMap<>());
+        }
+        tracking.getStatusHistory().put(OrderStatus.READY_FOR_PICKUP.toString(), LocalDateTime.now());
+        tracking.setDeliveryPartnerPhone(deliveryPartnerUser.getPhoneNumber());
+        tracking.setDeliveryPartnerName(deliveryPartnerUser.getFirstName() + " " + deliveryPartnerUser.getLastName());
         orderTrackingRepository.save(tracking);
+
+        safeNotify(deliveryPartnerUser.getId(), "New delivery assigned",
+                "Order #" + order.getOrderNumber() + " is ready for pickup.",
+                NotificationType.DELIVERY_UPDATE, order.getId());
+        safeNotify(order.getUser().getId(), "Delivery partner assigned",
+                deliveryPartnerUser.getFirstName() + " is assigned for order #" + order.getOrderNumber() + ".",
+                NotificationType.DELIVERY_UPDATE, order.getId());
         
         return convertToResponse(updatedOrder);
     }
@@ -445,6 +489,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderSummaryResponse> getOrderHistory(String userEmail, Pageable pageable) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

@@ -66,12 +66,12 @@ export default function DeliveryDashboard() {
     }
   };
 
-  const activeAssignments = assignments?.filter(a => 
-    ['PENDING', 'ACCEPTED', 'PICKED_UP'].includes(a.assignmentStatus)
+  const activeAssignments = assignments?.filter(a =>
+    ['PENDING', 'ACCEPTED', 'PICKED_UP'].includes(String(a.assignmentStatus || a.status || '').toUpperCase())
   ) || [];
 
-  const completedAssignments = assignments?.filter(a => 
-    ['DELIVERED', 'CANCELLED'].includes(a.assignmentStatus)
+  const completedAssignments = assignments?.filter(a =>
+    ['DELIVERED', 'CANCELLED'].includes(String(a.assignmentStatus || a.status || '').toUpperCase())
   ) || [];
 
   const authUserName = [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ');
