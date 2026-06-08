@@ -43,7 +43,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String[] PUBLIC_GET_PREFIXES = {
             "/categories",
-            "/menu",
             "/reviews/restaurant",
             "/reviews/delivery-partner"
     };
@@ -127,6 +126,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return true;
             }
 
+            if (isPublicMenuRead(path)) {
+                return true;
+            }
+
             for (String publicPrefix : PUBLIC_GET_PREFIXES) {
                 if (path.equals(publicPrefix) || path.startsWith(publicPrefix + "/")) {
                     return true;
@@ -156,6 +159,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 && "restaurants".equals(parts[1])
                 && isLong(parts[2])
                 && "stats".equals(parts[3]);
+    }
+
+    private boolean isPublicMenuRead(String path) {
+        if (path.equals("/menu")) {
+            return false;
+        }
+
+        if (path.startsWith("/menu/restaurant/")) {
+            return true;
+        }
+
+        String[] parts = path.split("/");
+        return parts.length == 3 && "menu".equals(parts[1]) && isLong(parts[2]);
     }
 
     private boolean isLong(String value) {
