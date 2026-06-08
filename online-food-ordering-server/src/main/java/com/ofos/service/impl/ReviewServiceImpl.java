@@ -434,7 +434,17 @@ public class ReviewServiceImpl implements ReviewService {
     }
     
     private ReviewResponse convertToResponse(Review review) {
-        ReviewResponse response = modelMapper.map(review, ReviewResponse.class);
+        ReviewResponse response = new ReviewResponse();
+        response.setId(review.getId());
+        response.setRating(review.getRating());
+        response.setComment(review.getComment());
+        response.setReviewType(review.getReviewType() != null ? review.getReviewType().name() : null);
+        response.setReviewImages(review.getReviewImages());
+        response.setIsVerified(review.getIsVerified());
+        response.setIsApproved(review.getIsApproved());
+        response.setHelpfulCount(review.getHelpfulCount());
+        response.setNotHelpfulCount(review.getNotHelpfulCount());
+        response.setCreatedAt(review.getCreatedAt());
         
         response.setUserId(review.getUser().getId());
         response.setUserName(review.getUser().getFirstName() + " " + review.getUser().getLastName());
