@@ -42,7 +42,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     };
 
     private static final String[] PUBLIC_GET_PREFIXES = {
-            "/restaurants",
             "/categories",
             "/menu",
             "/reviews/restaurant",
@@ -124,6 +123,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if ("GET".equalsIgnoreCase(request.getMethod())) {
+            if (isPublicRestaurantRead(path)) {
+                return true;
+            }
+
             for (String publicPrefix : PUBLIC_GET_PREFIXES) {
                 if (path.equals(publicPrefix) || path.startsWith(publicPrefix + "/")) {
                     return true;
@@ -131,5 +134,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         return false;
+    }
+
+    private boolean isPublicRestaurantRead(String path) {
+        if (path.equals("/restaurants")
+                || path.equals("/restaurants/top-rated")
+                || path.equals("/restaurants/search")
+                || path.equals("/restaurants/filter")) {
+            return true;
+        }
+
+        if (path.equals("/restaurants/my") || path.startsWith("/restaurants/owner/")) {
+            return false;
+        }
+
+        String[] parts = path.split("/");
+        if (parts.length == 3 && "restaurants".equals(parts[1])) {
+            return isLong(parts[2]);
+        }
+        return parts.length == 4
+                && "restaurants".equals(parts[1])
+                && isLong(parts[2])
+                && "stats".equals(parts[3]);
+    }
+
+    private boolean isLong(String value) {
+        try {
+            Long.parseLong(value);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
     }
 }
