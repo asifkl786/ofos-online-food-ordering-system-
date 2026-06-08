@@ -64,6 +64,12 @@ public class SecurityConfig {
 
                 // Public category reads are used by customer menu filters and owner menu forms.
                 .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+
+                // Public review reads are shown on restaurant detail and full review pages.
+                .requestMatchers(HttpMethod.GET, "/reviews/restaurant/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/reviews/delivery-partner/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/reviews/{reviewId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/reviews/{reviewId}/replies").permitAll()
                 
                // âœ… PUBLIC Menu endpoints (GET requests only)
                 .requestMatchers("/menu/**").permitAll()

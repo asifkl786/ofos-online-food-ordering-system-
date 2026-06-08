@@ -40,6 +40,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/auth/reset-password",
             "/auth/validate"
     };
+
+    private static final String[] PUBLIC_GET_PREFIXES = {
+            "/restaurants",
+            "/categories",
+            "/menu",
+            "/reviews/restaurant",
+            "/reviews/delivery-partner"
+    };
     
     @Override
     protected void doFilterInternal(
@@ -54,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return; // yahi pe stop
         }
 
-        if (isPublicAuthRequest(request)) {
+        if (isPublicRequest(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -102,7 +110,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublicAuthRequest(HttpServletRequest request) {
+    private boolean isPublicRequest(HttpServletRequest request) {
         String path = request.getRequestURI();
         String contextPath = request.getContextPath();
         if (contextPath != null && !contextPath.isBlank() && path.startsWith(contextPath)) {
@@ -112,6 +120,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         for (String publicPath : PUBLIC_AUTH_PATHS) {
             if (path.equals(publicPath)) {
                 return true;
+            }
+        }
+
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            for (String publicPrefix : PUBLIC_GET_PREFIXES) {
+                if (path.equals(publicPrefix) || path.startsWith(publicPrefix + "/")) {
+                    return true;
+                }
             }
         }
         return false;

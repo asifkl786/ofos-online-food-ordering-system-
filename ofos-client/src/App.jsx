@@ -76,6 +76,10 @@ export default function AppRoutes() {
             </Route>
           </Route>
 
+          <Route element={<MainLayout />}>
+            <Route path="/reviews/:id" element={<ReviewPage />} />
+          </Route>
+
           {/* âœ… Protected Routes - Authentication required */}
           {/* User logged in â†’ Main app dikhega */}
           <Route element={<PrivateRoute />}>
@@ -100,8 +104,6 @@ export default function AppRoutes() {
                 {/* // Add these routes (protected, only delivery partner) */}
                 <Route path="/delivery/register" element={<DeliveryPartnerRegistration />} />
                 <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
-                 {/* âœ… Review Module Route - ADD THIS */}
-                 <Route path="/reviews/:id" element={<ReviewPage />} />
                  <Route path="/wallet" element={<WalletPage />} />
                  <Route path="/notifications" element={<NotificationPage />} />
                                   <Route

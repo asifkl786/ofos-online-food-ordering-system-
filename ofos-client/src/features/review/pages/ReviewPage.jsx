@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useReview } from '../hooks/useReview';
 import ReviewList from '../components/ReviewList';
 import ReviewForm from '../components/ReviewForm';
 import RatingStars from '../components/RatingStars';
-import { formatCurrency } from '../utils/reviewHelpers';
 import { FiStar, FiTrendingUp, FiMessageCircle, FiPlus } from 'react-icons/fi';
 
 export default function ReviewPage() {
   const { id: restaurantId } = useParams();
-  const navigate = useNavigate();
   const { 
     reviews, 
     ratingSummary, 
@@ -20,8 +18,7 @@ export default function ReviewPage() {
     vote,
     editReview,
     removeReview,
-    canReview,
-    canUserReview
+    canReview
   } = useReview();
   
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -30,7 +27,6 @@ export default function ReviewPage() {
     if (restaurantId) {
       getRestaurantReviews(restaurantId);
       getRatingSummary(restaurantId);
-      canUserReview(restaurantId);
     }
   }, [restaurantId]);
 

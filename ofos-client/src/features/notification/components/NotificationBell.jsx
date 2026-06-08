@@ -4,21 +4,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NotificationList from './NotificationList';
 import { useNotification } from '../hooks/useNotification';
 import { API_BASE_URL } from '../../../api/axiosConfig';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 export default function NotificationBell() {
   const { unreadCount, getUnreadCount, getNotifications, addNotification, notifications, isLoading } = useNotification();
+  const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
   const closeTimerRef = useRef(null);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return undefined;
+    }
+
     getUnreadCount();
     const refreshTimer = setInterval(getUnreadCount, 30000);
     return () => clearInterval(refreshTimer);
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return undefined;
+    }
+
     const token = localStorage.getItem('accessToken');
     if (!token || typeof EventSource === 'undefined') {
       return undefined;
@@ -42,13 +52,13 @@ export default function NotificationBell() {
     };
 
     return () => source.close();
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isAuthenticated && isOpen) {
       getNotifications(0, 20);
     }
-  }, [isOpen]);
+  }, [isAuthenticated, isOpen]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -67,6 +77,7 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   const openDropdown = () => {
+    if (!isAuthenticated) return;
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
     }
@@ -76,6 +87,8 @@ export default function NotificationBell() {
   const closeDropdownWithDelay = () => {
     closeTimerRef.current = setTimeout(() => setIsOpen(false), 140);
   };
+
+  if (!isAuthenticated) return null;
 
   return (
     <div className="relative" onMouseEnter={openDropdown} onMouseLeave={closeDropdownWithDelay}>
