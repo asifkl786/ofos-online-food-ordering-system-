@@ -17,6 +17,8 @@ export const adminService = {
   downloadRevenueInvoice: ({ startDate, endDate }) => api.get('/admin/revenue-invoice', {
     params: { startDate, endDate },
     responseType: 'blob',
+    timeout: 120000,
+    skipGlobalErrorToast: true,
   }),
   activateUser: (id) => api.post(`/users/${id}/activate`),
   deactivateUser: (id) => api.post(`/users/${id}/deactivate`),

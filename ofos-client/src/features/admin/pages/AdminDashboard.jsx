@@ -119,6 +119,29 @@ const getCurrentYearRevenueRange = () => {
     endDate: toDateInputValue(end),
   };
 };
+const getBlobText = async (value) => {
+  if (value instanceof Blob) {
+    return value.text();
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  return '';
+};
+const getInvoiceErrorMessage = async (error) => {
+  const data = error?.response?.data;
+  if (data instanceof Blob) {
+    const text = await getBlobText(data);
+    if (!text) return 'Revenue invoice download failed';
+    try {
+      const parsed = JSON.parse(text);
+      return parsed.message || parsed.error || 'Revenue invoice download failed';
+    } catch {
+      return text.length > 180 ? 'Revenue invoice download failed' : text;
+    }
+  }
+  return data?.message || error?.message || 'Revenue invoice download failed';
+};
 
 const emptyMenuForm = {
   restaurantId: '',
@@ -546,7 +569,18 @@ export default function AdminDashboard() {
     setRevenueInvoiceLoading(true);
     try {
       const response = await adminService.downloadRevenueInvoice(revenueInvoiceRange);
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = response.data instanceof Blob
+        ? response.data
+        : new Blob([response.data], { type: 'application/pdf' });
+
+      const headerType = response.headers?.['content-type'] || '';
+      const blobType = blob.type || headerType;
+      const pdfMagic = await blob.slice(0, 4).text();
+      if (!blobType.includes('pdf') && pdfMagic !== '%PDF') {
+        const message = await getInvoiceErrorMessage({ response: { data: blob } });
+        throw new Error(message);
+      }
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -554,10 +588,10 @@ export default function AdminDashboard() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
+      window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
       toast.success('Revenue invoice downloaded');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Revenue invoice download failed');
+      toast.error(await getInvoiceErrorMessage(error));
     } finally {
       setRevenueInvoiceLoading(false);
     }

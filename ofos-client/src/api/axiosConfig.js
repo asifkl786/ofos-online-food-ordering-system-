@@ -93,8 +93,10 @@ api.interceptors.response.use(
       }
     }
     
-    const message = error.response?.data?.message || 'Something went wrong';
-    toast.error(message);
+    if (!error.config?.skipGlobalErrorToast) {
+      const message = error.response?.data?.message || 'Something went wrong';
+      toast.error(message);
+    }
     return Promise.reject(error);
   }
 );
