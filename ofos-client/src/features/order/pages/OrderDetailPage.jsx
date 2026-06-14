@@ -8,6 +8,7 @@ import OrderTimeline from '../components/OrderTimeline';
 import { formatCurrency, formatDate } from '../utils/orderHelpers';
 import { FiArrowLeft, FiTruck, FiMapPin, FiPhone, FiClock } from 'react-icons/fi';
 import DeliveryAssignmentModal from '../../delivery/components/DeliveryAssignmentModal';
+import Loader from '../../../components/common/Loader';
 
 export default function OrderDetailPage() {
   const { id } = useParams();
@@ -46,7 +47,7 @@ export default function OrderDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <Loader size="lg" />
       </div>
     );
   }

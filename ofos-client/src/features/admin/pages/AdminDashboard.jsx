@@ -31,6 +31,7 @@ import {
   FiX,
 } from 'react-icons/fi';
 import { adminService } from '../services/adminService';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 const tabs = ['Overview', 'Users', 'Restaurants', 'Orders', 'Menu', 'Categories', 'Delivery', 'Payments/Wallet', 'Reviews', 'Audit Logs', 'Create Admin'];
 const orderStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
@@ -721,7 +722,7 @@ export default function AdminDashboard() {
                   disabled={revenueInvoiceLoading}
                   className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {revenueInvoiceLoading ? <FiRefreshCw className="animate-spin" /> : <FiDownload />}
+                  {revenueInvoiceLoading ? <ButtonLoader /> : <FiDownload />}
                   Download PDF
                 </button>
               </div>
@@ -1284,7 +1285,7 @@ function ProgressNotice({ message }) {
   return (
     <div className="flex items-center gap-3 rounded-lg border border-orange-100 bg-orange-50 px-3 py-2 text-sm text-orange-700 shadow-sm">
       <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-orange-500 shadow-sm">
-        <FiRefreshCw className="h-4 w-4 animate-spin" />
+        <ButtonLoader />
       </span>
       <span>{message}</span>
     </div>
@@ -1352,7 +1353,7 @@ function ConfirmDialog({ dialog, onCancel, onConfirm, saving }) {
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" onClick={onCancel} disabled={saving} className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60">Cancel</button>
           <button type="button" onClick={onConfirm} disabled={saving} className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-60 ${dialog.danger ? 'bg-red-600 hover:bg-red-700' : 'bg-orange-500 hover:bg-orange-600'}`}>
-            {saving && <FiRefreshCw className="animate-spin" />} Confirm
+            {saving && <ButtonLoader />} Confirm
           </button>
         </div>
       </div>
@@ -1541,7 +1542,7 @@ function ToggleRow({ label, checked, onChange }) {
 function SubmitButton({ children, icon: Icon, disabled, loading = false }) {
   return (
     <button disabled={disabled} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 font-medium text-white hover:bg-orange-600 disabled:opacity-60">
-      {loading ? <FiRefreshCw className="animate-spin" /> : <Icon />} {children}
+      {loading ? <ButtonLoader /> : <Icon />} {children}
     </button>
   );
 }

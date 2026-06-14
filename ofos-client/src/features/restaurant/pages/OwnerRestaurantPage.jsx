@@ -7,6 +7,7 @@ import RestaurantStats from '../components/RestaurantStats';
 import OwnerRestaurantCard from '../components/OwnerRestaurantCard';
 import RestaurantModal from '../components/RestaurantModal';
 import OwnerMenuManager from '../../menu/components/OwnerMenuManager';
+import Loader from '../../../components/common/Loader';
 
 export default function OwnerRestaurantPage() {
   const { user } = useAuth();
@@ -121,7 +122,7 @@ export default function OwnerRestaurantPage() {
   if (isLoading && !ownerRestaurants.length) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-orange-500" />
+        <Loader size="lg" />
       </div>
     );
   }

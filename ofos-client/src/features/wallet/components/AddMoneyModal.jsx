@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiCreditCard, FiSmartphone, FiLock } from 'react-icons/fi';
 import { formatCurrency, getAddMoneySuggestions } from '../utils/walletHelpers';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 export default function AddMoneyModal({ isOpen, onClose, onAddMoney, isLoading }) {
   const [amount, setAmount] = useState('');
@@ -153,8 +154,10 @@ export default function AddMoneyModal({ isOpen, onClose, onAddMoney, isLoading }
               <button
                 type="submit"
                 disabled={!amount || isLoading}
-                className="flex-1 bg-orange-500 text-white py-2 rounded-xl font-medium hover:bg-orange-600 disabled:opacity-50"
+                aria-busy={isLoading}
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 py-2 font-medium text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
+                {isLoading && <ButtonLoader />}
                 {isLoading ? 'Processing...' : `Add ${formatCurrency(parseFloat(amount) || 0)}`}
               </button>
             </div>

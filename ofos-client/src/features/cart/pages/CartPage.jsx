@@ -3,8 +3,9 @@ import { useCart } from '../hooks/useCart';
 import CartItem from '../components/CartItem';
 import CartSummary from '../components/CartSummary';
 import EmptyCart from '../components/EmptyCart';
-import { FiLoader,FiTrash2 } from 'react-icons/fi';
+import { FiTrash2 } from 'react-icons/fi';
 import toast from "react-hot-toast";
+import Loader from '../../../components/common/Loader';
 
 export default function CartPage() {
   const { 
@@ -60,7 +61,7 @@ export default function CartPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center cursor-pointer">
-        <FiLoader className="w-8 h-8 text-orange-500 animate-spin" />
+        <Loader size="lg" />
       </div>
     );
   }

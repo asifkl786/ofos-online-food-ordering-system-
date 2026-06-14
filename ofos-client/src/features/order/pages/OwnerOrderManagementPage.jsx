@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 import { orderService } from '../services/orderService';
 import DeliveryAssignmentModal from '../../delivery/components/DeliveryAssignmentModal';
 import { useDelivery } from '../../delivery/hooks/useDelivery';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 const statuses = ['ALL', 'PENDING', 'CONFIRMED', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'];
 
@@ -248,7 +249,7 @@ function OwnerOrderCard({ order, actionId, onView, onChangeStatus, onAssignRider
             <span className="inline-flex items-center gap-2 rounded-xl bg-green-50 px-3 py-2 text-sm font-bold text-green-700"><FiTruck /> Rider Assigned</span>
           ) : (
             <button onClick={() => onAssignRider(order)} disabled={actionId === order.id} className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white hover:bg-orange-600 disabled:opacity-60">
-              {actionId === order.id ? <FiRefreshCw className="animate-spin" /> : <FiTruck />} Assign Rider
+              {actionId === order.id ? <ButtonLoader /> : <FiTruck />} Assign Rider
             </button>
           )
         )}
@@ -259,7 +260,7 @@ function OwnerOrderCard({ order, actionId, onView, onChangeStatus, onAssignRider
 }
 
 function ActionButton({ next, loading, onClick }) {
-  return <button onClick={onClick} disabled={loading} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-white disabled:opacity-60 ${next.danger ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-500 hover:bg-orange-600'}`}>{loading ? <FiRefreshCw className="animate-spin" /> : <FiCheckCircle />} {next.label}</button>;
+  return <button onClick={onClick} disabled={loading} aria-busy={loading} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-white disabled:opacity-60 ${next.danger ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-500 hover:bg-orange-600'}`}>{loading ? <ButtonLoader /> : <FiCheckCircle />} {next.label}</button>;
 }
 
 function OrderDetailModal({ order, actionId, onClose, onChangeStatus, onAssignRider }) {
@@ -296,7 +297,7 @@ function OrderDetailModal({ order, actionId, onClose, onChangeStatus, onAssignRi
         <div className="flex flex-wrap gap-2 border-t border-slate-100 p-4">
           {order.status === 'READY_FOR_PICKUP' && !hasAssignedRider && (
             <button onClick={() => onAssignRider(order)} disabled={actionId === order.id} className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white hover:bg-orange-600 disabled:opacity-60">
-              {actionId === order.id ? <FiRefreshCw className="animate-spin" /> : <FiTruck />} Assign Rider
+              {actionId === order.id ? <ButtonLoader /> : <FiTruck />} Assign Rider
             </button>
           )}
           {meta.next.map((next) => <ActionButton key={next.status} next={next} loading={actionId === order.id} onClick={() => onChangeStatus(order, next.status)} />)}

@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { useDelivery } from '../hooks/useDelivery';
 import { FiTruck, FiUser, FiPhone, FiMapPin, FiCheckCircle } from 'react-icons/fi';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 const registrationSchema = yup.object({
   vehicleNumber: yup.string().required('Vehicle number is required'),
@@ -160,8 +161,10 @@ export default function DeliveryPartnerRegistration() {
                 <button
                   type="submit"
                   disabled={isSubmitting || isLoading}
-                  className="w-full mt-6 bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 cursor-pointer"
+                  aria-busy={isSubmitting || isLoading}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-3 font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
+                  {(isSubmitting || isLoading) && <ButtonLoader />}
                   {isSubmitting || isLoading ? 'Registering...' : 'Register as Delivery Partner'}
                 </button>
               </Form>

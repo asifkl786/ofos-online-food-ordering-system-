@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDelivery } from '../hooks/useDelivery';
 import DeliveryStatusBadge from '../components/DeliveryStatusBadge';
 import EarningsCard from '../components/EarningsCard';
-import { FiArrowLeft, FiLoader, FiMapPin, FiPhone, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
+import { FiArrowLeft, FiMapPin, FiPhone, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 import { formatDate } from '../utils/deliveryHelpers';
+import Loader, { ButtonLoader } from '../../../components/common/Loader';
 
 export default function DeliveryDashboard() {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ export default function DeliveryDashboard() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <Loader size="lg" />
       </div>
     );
   }
@@ -133,7 +134,7 @@ export default function DeliveryDashboard() {
               }`}
             >
               {availabilityUpdating ? (
-                <><FiLoader className="w-5 h-5 animate-spin" /> Updating...</>
+                <><ButtonLoader /> Updating...</>
               ) : isOnline ? (
                 <><FiToggleRight className="w-5 h-5" /> Online</>
               ) : (

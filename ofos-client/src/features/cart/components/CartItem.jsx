@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FiTrash2, FiMinus, FiPlus } from 'react-icons/fi';
 import { formatCurrency } from '../utils/cartHelpers';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 export default function CartItem({ item, onUpdateQuantity, onRemove }) {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -53,7 +54,9 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }) {
         >
           <FiMinus className="w-4 h-4" />
         </button>
-        <span className="w-8 text-center font-medium">{item.quantity}</span>
+        <span className="flex w-8 items-center justify-center text-center font-medium">
+          {isUpdating ? <ButtonLoader /> : item.quantity}
+        </span>
         <button
           onClick={() => handleQuantityChange(item.quantity + 1)}
           disabled={isUpdating}

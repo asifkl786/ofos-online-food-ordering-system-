@@ -11,6 +11,7 @@ import { formatCurrency } from '../utils/orderHelpers';
 import { FiMapPin, FiShoppingBag } from 'react-icons/fi';
 import { usePayment } from '../../payment/hooks/usePayment';
 import MockPaymentModal from '../../payment/components/MockPaymentModal';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -234,8 +235,10 @@ export default function CheckoutPage() {
             <button
               onClick={handlePlaceOrder}
               disabled={isLoading || paymentLoading || !selectedAddress}
-              className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              aria-busy={isLoading || paymentLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-3 font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
+              {(isLoading || paymentLoading) && <ButtonLoader />}
               {isLoading || paymentLoading ? 'Processing...' : `Place Order • ${formatCurrency(finalTotal)}`}
             </button>
             

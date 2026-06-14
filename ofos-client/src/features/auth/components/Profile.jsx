@@ -5,6 +5,7 @@ import { FiBell, FiBriefcase, FiCalendar, FiChevronRight, FiCreditCard, FiEdit2,
 import UpdateProfile from './UpdateProfile';
 import ChangePassword from './ChangePassword';
 import Button from '../../../components/common/Button';
+import Loader from '../../../components/common/Loader';
 
 export default function Profile() {
   const { user, getProfile, isLoading } = useAuth();
@@ -66,7 +67,7 @@ export default function Profile() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <Loader size="lg" />
       </div>
     );
   }

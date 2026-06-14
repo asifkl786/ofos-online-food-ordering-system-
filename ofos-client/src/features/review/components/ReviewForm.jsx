@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import RatingStars from './RatingStars';
 import { FiX, FiStar } from 'react-icons/fi';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 const reviewSchema = yup.object({
   rating: yup.number().min(1, 'Please select a rating').required('Rating is required'),
@@ -105,8 +106,10 @@ export default function ReviewForm({ orderId, restaurantId, restaurantName, init
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-orange-500 text-white py-2 rounded-xl font-medium hover:bg-orange-600 disabled:opacity-50"
+                  aria-busy={isSubmitting}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 py-2 font-medium text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
+                  {isSubmitting && <ButtonLoader />}
                   {isSubmitting ? (isEditing ? 'Updating...' : 'Submitting...') : (isEditing ? 'Update Review' : 'Submit Review')}
                 </button>
               </div>

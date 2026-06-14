@@ -22,6 +22,7 @@ import RatingStars from '../components/RatingStars';
 import MenuPage from '../../menu/pages/MenuPage';
 import ReviewList from '../../review/components/ReviewList';
 import { useReview } from '../../review/hooks/useReview';
+import Loader from '../../../components/common/Loader';
 
 const formatCurrency = (amount) => {
   if (!amount) return 'Rs. 0';
@@ -88,7 +89,7 @@ export default function RestaurantDetail() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-orange-500" />
+          <Loader size="lg" className="mx-auto mb-4" />
           <p className="text-gray-500">Loading restaurant details...</p>
         </div>
       </div>

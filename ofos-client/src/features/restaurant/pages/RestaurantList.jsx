@@ -4,7 +4,7 @@ import RestaurantGrid from '../components/RestaurantGrid';
 import RestaurantSearch from '../components/RestaurantSearch';
 import RestaurantFilters from '../components/RestaurantFilters';
 import EmptyState from '../components/EmptyState';
-import { FiLoader } from 'react-icons/fi';
+import Loader from '../../../components/common/Loader';
 
 export default function RestaurantList() {
   const { 
@@ -140,7 +140,7 @@ export default function RestaurantList() {
         {/* Loading More */}
         {isLoading && restaurants.length > 0 && (
           <div className="text-center mt-8">
-            <FiLoader className="w-6 h-6 text-orange-500 animate-spin mx-auto" />
+            <Loader size="sm" className="mx-auto" />
           </div>
         )}
       </div>

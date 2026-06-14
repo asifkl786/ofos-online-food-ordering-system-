@@ -2,6 +2,7 @@
 import { FiCheckCircle, FiEdit3, FiEye, FiImage, FiPackage, FiPlus, FiRefreshCw, FiTag, FiTrash2, FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { menuService } from '../services/menuService';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 const emptyForm = {
   name: '',
@@ -271,7 +272,7 @@ export default function OwnerMenuManager({ restaurant, isOpen, onClose }) {
                 <div className="mt-2 flex gap-2">
                   <input className={inputClass} value={newCategoryName} disabled={saving || categorySaving} onChange={(event) => setNewCategoryName(event.target.value)} placeholder="e.g., Mughlai, Starter" />
                   <button type="button" onClick={handleCreateCategory} disabled={saving || categorySaving || newCategoryName.trim().length < 2} className="inline-flex min-w-24 items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white disabled:opacity-60">
-                    {categorySaving ? <FiRefreshCw className="animate-spin" /> : <FiPlus />}
+                    {categorySaving ? <ButtonLoader /> : <FiPlus />}
                     Add
                   </button>
                 </div>
@@ -324,7 +325,7 @@ export default function OwnerMenuManager({ restaurant, isOpen, onClose }) {
                   </button>
                 )}
                 <button type="submit" disabled={saving || categorySaving} className={`flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-orange-100 disabled:opacity-70 ${editingItem ? '' : 'sm:col-span-2'}`}>
-                  {saving ? <FiRefreshCw className="animate-spin" /> : editingItem ? <FiEdit3 /> : <FiPackage />}
+                  {saving ? <ButtonLoader /> : editingItem ? <FiEdit3 /> : <FiPackage />}
                   {saving ? (editingItem ? 'Updating Item...' : 'Adding Item...') : editingItem ? 'Update Menu Item' : 'Add Menu Item'}
                 </button>
               </div>
@@ -373,7 +374,7 @@ export default function OwnerMenuManager({ restaurant, isOpen, onClose }) {
                     </div>
                     <div className="mt-4 flex gap-2">
                       <button type="button" onClick={() => toggleAvailability(item)} disabled={actionId === item.id} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">
-                        {actionId === item.id ? <FiRefreshCw className="animate-spin" /> : <FiCheckCircle />}
+                        {actionId === item.id ? <ButtonLoader /> : <FiCheckCircle />}
                         {item.isAvailable ? 'Hide' : 'Show'}
                       </button>
                       <button type="button" onClick={() => openItemDetails(item)} disabled={actionId === item.id} className="inline-flex items-center justify-center rounded-xl border border-blue-100 px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 disabled:opacity-60" title="View menu item details" aria-label="View menu item details">

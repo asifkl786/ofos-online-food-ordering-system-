@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiCreditCard, FiSmartphone, FiLock, FiCalendar, FiHome } from 'react-icons/fi';
 import { formatCurrency, formatCardNumber, formatExpiry, validateCardNumber, validateExpiry, validateCVV } from '../utils/paymentHelpers';
+import { ButtonLoader } from '../../../components/common/Loader';
 
 const paymentMethods = [
   { id: 'DEBIT_CARD', label: 'Card', short: 'CC' },
@@ -282,7 +283,7 @@ export default function MockPaymentModal({ isOpen, onClose, amount, orderId, ini
             >
               {isProcessing ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <ButtonLoader />
                   Processing...
                 </span>
               ) : paymentMethod === 'CASH_ON_DELIVERY' ? (

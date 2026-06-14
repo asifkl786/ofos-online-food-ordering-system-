@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiRefreshCw, FiX, FiSearch } from 'react-icons/fi';
+import { FiX, FiSearch } from 'react-icons/fi';
 import DeliveryPartnerCard from './DeliveryPartnerCard';
 import { useDelivery } from '../hooks/useDelivery';
+import Loader, { ButtonLoader } from '../../../components/common/Loader';
 
 export default function DeliveryAssignmentModal({ isOpen, onClose, orderId, onAssign }) {
   const { availablePartners, fetchAvailablePartners, isLoading } = useDelivery();
@@ -80,7 +81,7 @@ export default function DeliveryAssignmentModal({ isOpen, onClose, orderId, onAs
           <div className="p-4 space-y-3 max-h-100 overflow-y-auto">
             {isLoading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                <Loader size="md" className="mx-auto" />
                 <p className="text-gray-500 mt-2">Loading partners...</p>
               </div>
             ) : filteredPartners.length === 0 ? (
@@ -113,7 +114,7 @@ export default function DeliveryAssignmentModal({ isOpen, onClose, orderId, onAs
               disabled={!selectedPartner || isAssigning}
               className="flex-1 inline-flex items-center justify-center gap-2 bg-orange-500 text-white py-2 rounded-xl font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isAssigning && <FiRefreshCw className="h-4 w-4 animate-spin" />}
+              {isAssigning && <ButtonLoader />}
               {isAssigning ? 'Assigning...' : 'Assign Partner'}
             </button>
           </div>

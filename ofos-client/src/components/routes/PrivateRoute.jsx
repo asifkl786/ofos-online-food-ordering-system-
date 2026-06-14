@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { FiAlertCircle, FiLock, FiLogIn, FiHome } from 'react-icons/fi';
+import Loader from '../common/Loader';
 
 const PrivateRoute = () => {
   const { isAuthenticated, isLoading, user } = useSelector((state) => state.auth);
@@ -21,12 +22,7 @@ const PrivateRoute = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-gray-50 to-gray-100">
-        <div className="relative">
-          {/* Outer ring */}
-          <div className="w-16 h-16 border-4 border-orange-200 rounded-full animate-pulse"></div>
-          {/* Inner spinner */}
-          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+        <Loader size="xl" />
         <p className="mt-4 text-gray-600 font-medium">Verifying your access...</p>
         <p className="mt-2 text-sm text-gray-400">Please wait while we check your credentials</p>
       </div>

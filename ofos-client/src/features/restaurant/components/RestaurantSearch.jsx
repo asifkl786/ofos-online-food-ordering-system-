@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
+import Loader from '../../../components/common/Loader';
 
 export default function RestaurantSearch({ onSearch, initialKeyword = '' }) {
   const [keyword, setKeyword] = useState(initialKeyword);
@@ -46,7 +47,7 @@ export default function RestaurantSearch({ onSearch, initialKeyword = '' }) {
       </div>
       {isTyping && (
         <div className="absolute right-4 top-1/2 -translate-y-1/2">
-          <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          <Loader size="sm" />
         </div>
       )}
     </div>
