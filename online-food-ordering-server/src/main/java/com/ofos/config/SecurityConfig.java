@@ -38,6 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Browser preflight requests do not carry JWT tokens, so security must allow them before CORS responds.
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 // âœ… PUBLIC Swagger URLs
                 .requestMatchers(
                     "/swagger-ui/**",
